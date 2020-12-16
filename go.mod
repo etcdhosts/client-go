@@ -1,4 +1,4 @@
-module github.com/etcdhosts/client-go/v1
+module github.com/etcdhosts/client-go
 
 go 1.15
 
