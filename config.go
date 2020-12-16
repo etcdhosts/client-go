@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type EtcdConfig struct {
+type Config struct {
 	CA          string        `json:"ca" yaml:"ca"`
 	Cert        string        `json:"cert" yaml:"cert"`
 	Key         string        `json:"key" yaml:"key"`
