@@ -54,12 +54,12 @@ func TestHostsfile_AddHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = hf.AddHost("baidu.com", "1.1.1.1", false)
+	err = hf.AddHost("baidu.com", "1.1.1.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(hf.hmap)
-	err = hf.AddHost("baidu.com", "::0202:0202", true)
+	err = hf.AddHost("baidu.com", "::0202:0202")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestClient_PutHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = hf.AddHost("baidu.com", "1.2.3.12", false)
+	err = hf.AddHost("baidu.com", "1.2.3.12")
 	if err != nil {
 		t.Fatal(err)
 	}
