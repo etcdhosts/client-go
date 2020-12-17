@@ -275,7 +275,7 @@ func (h *Hostsfile) PurgeHost(host string) {
 	}
 }
 
-// SearchHost Search all IPs matching the given host from the hosts map
+// SearchHost search all IPs matching the given host from the hosts map
 func (h *Hostsfile) SearchHost(host string) []net.IP {
 	var ips []net.IP
 	lowerHost := Name(strings.ToLower(host)).Normalize()
@@ -288,4 +288,9 @@ func (h *Hostsfile) SearchHost(host string) []net.IP {
 	}
 
 	return ips
+}
+
+// String return hosts map string
+func (h *Hostsfile) String() string {
+	return h.hmap.String()
 }
