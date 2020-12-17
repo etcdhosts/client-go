@@ -25,7 +25,7 @@ func TestClient_ReadHosts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hf, err := cli.ReadHosts()
+	hf, err := cli.ReadHostsFile()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestClient_GetHistoryHosts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hfs, err := cli.GetHostsHistory()
+	hfs, err := cli.GetHostsFileHistory()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestHostsfile_AddHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hf, err := cli.ReadHosts()
+	hf, err := cli.ReadHostsFile()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestHostsfile_AddHost(t *testing.T) {
 }
 
 func TestHostsfile_DelHost(t *testing.T) {
-	hf := &Hostsfile{
+	hf := &HostsFile{
 		hmap:    newMap(),
 		version: 1,
 	}
@@ -91,7 +91,7 @@ func TestClient_PutHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hf, err := cli.ReadHosts()
+	hf, err := cli.ReadHostsFile()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +99,7 @@ func TestClient_PutHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = cli.PutHost(hf)
+	err = cli.PutHostsFile(hf)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func TestHostsfile_SearchHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hf, err := cli.ReadHosts()
+	hf, err := cli.ReadHostsFile()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestHostsfile_PurgeHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hf, err := cli.ReadHosts()
+	hf, err := cli.ReadHostsFile()
 	if err != nil {
 		t.Fatal(err)
 	}

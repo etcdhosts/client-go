@@ -23,8 +23,8 @@ type Map struct {
 	addr map[string][]string
 }
 
-// Hostsfile contains known host entries.
-type Hostsfile struct {
+// HostsFile contains known host entries.
+type HostsFile struct {
 	sync.RWMutex
 
 	// hosts maps for lookups
@@ -98,8 +98,8 @@ func parseIP(addr string) net.IP {
 	return net.ParseIP(addr)
 }
 
-// Parse reads the hostsfile and populates the byName and addr maps.
-func Parse(r io.Reader) *Map {
+// parse2Map reads the hostsfile and populates the byName and addr maps.
+func parse2Map(r io.Reader) *Map {
 	hmap := newMap()
 
 	scanner := bufio.NewScanner(r)
@@ -143,7 +143,7 @@ func Parse(r io.Reader) *Map {
 }
 
 // lookupStaticHost looks up the IP addresses for the given host from the hosts file.
-func (h *Hostsfile) lookupStaticHost(m map[string][]net.IP, host string) []net.IP {
+func (h *HostsFile) lookupStaticHost(m map[string][]net.IP, host string) []net.IP {
 	h.RLock()
 	defer h.RUnlock()
 
@@ -161,19 +161,19 @@ func (h *Hostsfile) lookupStaticHost(m map[string][]net.IP, host string) []net.I
 }
 
 // LookupStaticHostV4 looks up the IPv4 addresses for the given host from the hosts file.
-func (h *Hostsfile) LookupStaticHostV4(host string) []net.IP {
+func (h *HostsFile) LookupStaticHostV4(host string) []net.IP {
 	host = strings.ToLower(host)
 	return h.lookupStaticHost(h.hmap.name4, host)
 }
 
 // LookupStaticHostV6 looks up the IPv6 addresses for the given host from the hosts file.
-func (h *Hostsfile) LookupStaticHostV6(host string) []net.IP {
+func (h *HostsFile) LookupStaticHostV6(host string) []net.IP {
 	host = strings.ToLower(host)
 	return h.lookupStaticHost(h.hmap.name6, host)
 }
 
 // LookupStaticAddr looks up the hosts for the given address from the hosts file.
-func (h *Hostsfile) LookupStaticAddr(addr string) []string {
+func (h *HostsFile) LookupStaticAddr(addr string) []string {
 	addr = parseIP(addr).String()
 	if addr == "" {
 		return nil
@@ -192,7 +192,7 @@ func (h *Hostsfile) LookupStaticAddr(addr string) []string {
 }
 
 // AddHost add a record to the hosts map
-func (h *Hostsfile) AddHost(host, ip string) error {
+func (h *HostsFile) AddHost(host, ip string) error {
 	newIP := net.ParseIP(ip)
 	if newIP == nil {
 		return fmt.Errorf("invalid ip address: %s", ip)
@@ -224,7 +224,7 @@ func (h *Hostsfile) AddHost(host, ip string) error {
 }
 
 // DelHost delete exactly one record from the hosts map
-func (h *Hostsfile) DelHost(host, ip string) error {
+func (h *HostsFile) DelHost(host, ip string) error {
 	delIP := net.ParseIP(ip)
 	if delIP == nil {
 		return fmt.Errorf("invalid ip address: %s", ip)
@@ -260,7 +260,7 @@ func (h *Hostsfile) DelHost(host, ip string) error {
 }
 
 // PurgeHost delete all records of a given host from the hosts map
-func (h *Hostsfile) PurgeHost(host string) {
+func (h *HostsFile) PurgeHost(host string) {
 	lowerHost := Name(strings.ToLower(host)).Normalize()
 	if _, ok := h.hmap.name4[lowerHost]; ok {
 		h.Lock()
@@ -276,7 +276,7 @@ func (h *Hostsfile) PurgeHost(host string) {
 }
 
 // SearchHost search all IPs matching the given host from the hosts map
-func (h *Hostsfile) SearchHost(host string) []net.IP {
+func (h *HostsFile) SearchHost(host string) []net.IP {
 	var ips []net.IP
 	lowerHost := Name(strings.ToLower(host)).Normalize()
 	if _, ok := h.hmap.name4[lowerHost]; ok {
@@ -291,6 +291,6 @@ func (h *Hostsfile) SearchHost(host string) []net.IP {
 }
 
 // String return hosts map string
-func (h *Hostsfile) String() string {
+func (h *HostsFile) String() string {
 	return h.hmap.String()
 }

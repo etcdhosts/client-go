@@ -7,7 +7,9 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -32,7 +34,7 @@ type Client struct {
 	etcdHostsKey string
 }
 
-func (cli *Client) ReadHosts() (*Hostsfile, error) {
+func (cli *Client) ReadHostsFile() (*HostsFile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), cli.etcdTimeout)
 	defer cancel()
 	getResp, err := cli.etcdClient.Get(ctx, cli.etcdHostsKey, clientv3.WithFirstRev()...)
@@ -46,13 +48,13 @@ func (cli *Client) ReadHosts() (*Hostsfile, error) {
 		return nil, fmt.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 	}
 
-	return &Hostsfile{
-		hmap:    Parse(bytes.NewReader(getResp.Kvs[0].Value)),
+	return &HostsFile{
+		hmap:    parse2Map(bytes.NewReader(getResp.Kvs[0].Value)),
 		version: getResp.Kvs[0].Version,
 	}, nil
 }
 
-func (cli *Client) GetHostsHistory() ([]*Hostsfile, error) {
+func (cli *Client) GetHostsFileHistory() ([]*HostsFile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), cli.etcdTimeout)
 	defer cancel()
 	getResp, err := cli.etcdClient.Get(ctx, cli.etcdHostsKey)
@@ -65,7 +67,7 @@ func (cli *Client) GetHostsHistory() ([]*Hostsfile, error) {
 		return nil, fmt.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 	}
 
-	var hfs []*Hostsfile
+	var hfs []*HostsFile
 	for i := getResp.Header.Revision; i > 0; i-- {
 		getCtx, getCancel := context.WithTimeout(context.Background(), cli.etcdTimeout)
 		resp, err := cli.etcdClient.Get(getCtx, cli.etcdHostsKey, clientv3.WithRev(i))
@@ -74,8 +76,8 @@ func (cli *Client) GetHostsHistory() ([]*Hostsfile, error) {
 			break
 		}
 		i = resp.Kvs[0].ModRevision
-		hfs = append(hfs, &Hostsfile{
-			hmap:    Parse(bytes.NewReader(resp.Kvs[0].Value)),
+		hfs = append(hfs, &HostsFile{
+			hmap:    parse2Map(bytes.NewReader(resp.Kvs[0].Value)),
 			version: resp.Kvs[0].Version,
 		})
 		getCancel()
@@ -83,7 +85,7 @@ func (cli *Client) GetHostsHistory() ([]*Hostsfile, error) {
 	return hfs, nil
 }
 
-func (cli *Client) PutHost(hf *Hostsfile) error {
+func (cli *Client) PutHostsFile(hf *HostsFile) error {
 	seCtx, cancel := context.WithTimeout(context.Background(), cli.etcdTimeout)
 	defer cancel()
 
@@ -99,7 +101,7 @@ func (cli *Client) PutHost(hf *Hostsfile) error {
 	if err != nil {
 		return fmt.Errorf("failed to lock etcd hosts key: %w", err)
 	}
-	shf, err := cli.ReadHosts()
+	shf, err := cli.ReadHostsFile()
 	if err != nil {
 		return fmt.Errorf("failed to read etcd hosts: %w", err)
 	}
@@ -118,6 +120,13 @@ func (cli *Client) PutHost(hf *Hostsfile) error {
 		return fmt.Errorf("etcd client error: %w", err)
 	}
 	return nil
+}
+
+func (cli *Client) ForcePutHostsFile(r io.Reader) error {
+	return cli.PutHostsFile(&HostsFile{
+		hmap:    parse2Map(r),
+		version: math.MaxInt64,
+	})
 }
 
 func NewClient(c Config) (*Client, error) {
