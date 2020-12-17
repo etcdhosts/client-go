@@ -192,14 +192,14 @@ func (h *Hostsfile) LookupStaticAddr(addr string) []string {
 }
 
 // AddHost add a record to the hosts map
-func (h *Hostsfile) AddHost(host, ip string, ipv6 bool) error {
+func (h *Hostsfile) AddHost(host, ip string) error {
 	newIP := net.ParseIP(ip)
 	if newIP == nil {
 		return fmt.Errorf("invalid ip address: %s", ip)
 	}
 
 	lowerHost := Name(strings.ToLower(host)).Normalize()
-	if !ipv6 {
+	if newIP.To4() != nil {
 		ips4 := h.LookupStaticHostV4(lowerHost)
 		for _, hip := range ips4 {
 			if hip.Equal(newIP) {
