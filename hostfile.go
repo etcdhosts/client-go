@@ -98,8 +98,8 @@ func parseIP(addr string) net.IP {
 	return net.ParseIP(addr)
 }
 
-// parse2Map reads the hostsfile and populates the byName and addr maps.
-func parse2Map(r io.Reader) *Map {
+// Parse2Map reads the hostsfile and populates the byName and addr maps.
+func Parse2Map(r io.Reader) *Map {
 	hmap := newMap()
 
 	scanner := bufio.NewScanner(r)
