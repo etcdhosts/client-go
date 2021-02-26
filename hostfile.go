@@ -32,6 +32,9 @@ type HostsFile struct {
 
 	// version are only read and modified by a single goroutine
 	version int64
+
+	// etcd ModRevision
+	modRevision int64
 }
 
 func newMap() *Map {
@@ -298,4 +301,9 @@ func (h *HostsFile) String() string {
 // Version return hosts version
 func (h *HostsFile) Version() int64 {
 	return h.version
+}
+
+// ModRevision return etcd ModRevision
+func (h *HostsFile) ModRevision() int64 {
+	return h.modRevision
 }

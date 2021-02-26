@@ -49,8 +49,9 @@ func (cli *Client) ReadHostsFile() (*HostsFile, error) {
 	}
 
 	return &HostsFile{
-		hmap:    Parse2Map(bytes.NewReader(getResp.Kvs[0].Value)),
-		version: getResp.Kvs[0].Version,
+		hmap:        Parse2Map(bytes.NewReader(getResp.Kvs[0].Value)),
+		version:     getResp.Kvs[0].Version,
+		modRevision: getResp.Kvs[0].ModRevision,
 	}, nil
 }
 
@@ -77,8 +78,9 @@ func (cli *Client) GetHostsFileHistory() ([]*HostsFile, error) {
 		}
 		i = resp.Kvs[0].ModRevision
 		hfs = append(hfs, &HostsFile{
-			hmap:    Parse2Map(bytes.NewReader(resp.Kvs[0].Value)),
-			version: resp.Kvs[0].Version,
+			hmap:        Parse2Map(bytes.NewReader(resp.Kvs[0].Value)),
+			version:     resp.Kvs[0].Version,
+			modRevision: resp.Kvs[0].ModRevision,
 		})
 		getCancel()
 	}
