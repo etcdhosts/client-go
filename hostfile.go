@@ -294,3 +294,8 @@ func (h *HostsFile) SearchHost(host string) []net.IP {
 func (h *HostsFile) String() string {
 	return h.hmap.String()
 }
+
+// Version return hosts version
+func (h *HostsFile) Version() int64 {
+	return h.version
+}
