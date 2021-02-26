@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-homedir"
+	"go.uber.org/zap"
 
 	"go.etcd.io/etcd/clientv3/concurrency"
 
@@ -212,6 +213,10 @@ func NewClient(c Config) (*Client, error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.Endpoints,
 		DialTimeout: c.DialTimeout,
+		LogConfig: &zap.Config{
+			Level:    zap.NewAtomicLevelAt(zap.ErrorLevel),
+			Encoding: "console",
+		},
 		TLS: &tls.Config{
 			RootCAs:      rootCertPool,
 			Certificates: []tls.Certificate{etcdClientCert},
