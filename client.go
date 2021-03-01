@@ -36,9 +36,20 @@ type Client struct {
 }
 
 func (cli *Client) ReadHostsFile() (*HostsFile, error) {
+	return cli.ReadHostsFileByRevision(0)
+}
+
+func (cli *Client) ReadHostsFileByRevision(revision int64) (*HostsFile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), cli.etcdTimeout)
 	defer cancel()
-	getResp, err := cli.etcdClient.Get(ctx, cli.etcdHostsKey, clientv3.WithFirstRev()...)
+
+	var getResp *clientv3.GetResponse
+	var err error
+	if revision > 0 {
+		getResp, err = cli.etcdClient.Get(ctx, cli.etcdHostsKey, clientv3.WithRev(revision))
+	} else {
+		getResp, err = cli.etcdClient.Get(ctx, cli.etcdHostsKey, clientv3.WithFirstRev()...)
+	}
 	if err != nil {
 		logger.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
 		return nil, fmt.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
