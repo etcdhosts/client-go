@@ -88,6 +88,10 @@ func (cli *Client) GetHostsFileHistory() ([]*HostsFile, error) {
 			getCancel()
 			break
 		}
+		if len(resp.Kvs) == 0 {
+			getCancel()
+			break
+		}
 		i = resp.Kvs[0].ModRevision
 		hfs = append(hfs, &HostsFile{
 			hmap:        Parse2Map(bytes.NewReader(resp.Kvs[0].Value)),
