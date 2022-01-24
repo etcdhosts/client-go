@@ -17,11 +17,9 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"go.uber.org/zap"
 
-	"go.etcd.io/etcd/clientv3/concurrency"
+	"go.etcd.io/etcd/client/v3/concurrency"
 
-	"github.com/mritd/logger"
-
-	"go.etcd.io/etcd/clientv3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type Client struct {
@@ -51,12 +49,10 @@ func (cli *Client) ReadHostsFileByRevision(revision int64) (*HostsFile, error) {
 		getResp, err = cli.etcdClient.Get(ctx, cli.etcdHostsKey, clientv3.WithFirstRev()...)
 	}
 	if err != nil {
-		logger.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
 		return nil, fmt.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
 	}
 
 	if len(getResp.Kvs) != 1 {
-		logger.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 		return nil, fmt.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 	}
 
@@ -72,11 +68,9 @@ func (cli *Client) GetHostsFileHistory() ([]*HostsFile, error) {
 	defer cancel()
 	getResp, err := cli.etcdClient.Get(ctx, cli.etcdHostsKey)
 	if err != nil {
-		logger.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
 		return nil, fmt.Errorf("failed to get etcd key [%s]: %s", cli.etcdHostsKey, err.Error())
 	}
 	if len(getResp.Kvs) != 1 {
-		logger.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 		return nil, fmt.Errorf("invalid etcd response: %d", len(getResp.Kvs))
 	}
 
